@@ -20,9 +20,10 @@ def save_entry(title, content):
     it is replaced.
     """
     filename = f"entries/{title}.md"
+    full_content = f"# {title}\n\n{content}"  # Prepend the title as a Markdown header
     if default_storage.exists(filename):
         default_storage.delete(filename)
-    default_storage.save(filename, ContentFile(content))
+    default_storage.save(filename, ContentFile(full_content))
 
 
 def get_entry(title):

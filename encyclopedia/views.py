@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-
+from django.http import HttpResponse
 from . import util
 
 import markdown2
@@ -45,4 +45,31 @@ def search(request):
             "query": query,
             "results": matching_entries
         })
+
+
+def create(request):
+    if request.method == "POST":
+        title = request.POST.get("title", "").strip()
+        content = request.POST.get("content", "").strip()
+
+        print(f"Title: {title}")  # Debugging line
+        print(f"Content: {content}")  # Debugging line
+
+        if not title or not content:
+            return render(request, "encyclopedia/create.html", {
+                "error": "Title and content cannot be empty."
+            })
+
+        # Check if the entry already exists
+        if title.lower() in [entry.lower() for entry in util.list_entries()]:
+            return render(request, "encyclopedia/create.html", {
+                "error": f"An entry with the title '{title}' already exists."
+            })
+
+        # Save the new entry
+        util.save_entry(title, content)
+        return redirect('entry', title=title)
+
+    return render(request, "encyclopedia/create.html")
+
 
