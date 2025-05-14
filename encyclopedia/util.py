@@ -13,17 +13,18 @@ def list_entries():
                 for filename in filenames if filename.endswith(".md")))
 
 
-def save_entry(title, content):
+def save_entry(title, content, is_edit=False):
     """
     Saves an encyclopedia entry, given its title and Markdown
     content. If an existing entry with the same title already exists,
-    it is replaced.
+    it is replaced. If is_edit is True, it does not prepend the title.
     """
     filename = f"entries/{title}.md"
-    full_content = f"# {title}\n\n{content}"  # Prepend the title as a Markdown header
+    if not is_edit:
+        content = f"# {title}\n\n{content}"  # Prepend the title as a Markdown header
     if default_storage.exists(filename):
         default_storage.delete(filename)
-    default_storage.save(filename, ContentFile(full_content))
+    default_storage.save(filename, ContentFile(content))
 
 
 def get_entry(title):

@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from . import util
 
 import markdown2
+import random
 
 
 def index(request):
@@ -73,3 +74,29 @@ def create(request):
     return render(request, "encyclopedia/create.html")
 
 
+def edit(request, title):
+    if request.method == "POST":
+        # Save the updated content
+        content = request.POST.get("content", "").strip()
+        util.save_entry(title, content, is_edit=True)  # Pass is_edit=True
+        return redirect('entry', title=title)
+
+    # Pre-populate the form with the existing content
+    content = util.get_entry(title)
+    if content is None:
+        return render(request, "encyclopedia/error.html", {
+            "message": f"The page '{title}' does not exist."
+        })
+
+    return render(request, "encyclopedia/edit.html", {
+        "title": title,
+        "content": content
+    })
+
+
+def random_page(request):
+    entries = util.list_entries()
+    if entries:
+        random_entry = random.choice(entries)
+        return redirect('entry', title=random_entry)
+    return redirect('index')  # Redirect to the index if no entries exist
